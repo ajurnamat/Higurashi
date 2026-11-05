@@ -67,7 +67,9 @@
     }
     .eyebrow { position: relative; z-index: 1; color: var(--accent); font-size: 12px; font-weight: 800; letter-spacing: .15em; }
     h1 { position: relative; z-index: 1; margin: 14px 0 10px; font-size: clamp(30px, 5vw, 52px); line-height: 1.15; letter-spacing: -.06em; }
-    .description { position: relative; z-index: 1; max-width: 540px; margin: 0; color: #c1beca; font-size: 15px; line-height: 1.8; }
+    .description { position: relative; z-index: 1; max-width: 820px; margin: 0; color: #c1beca; font-size: 14px; line-height: 1.9; }
+    .description p { margin: 0 0 12px; }
+    .description p:last-child { margin-bottom: 0; color: #e5e2eb; font-weight: 650; }
     .meta { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 9px; margin-top: 21px; }
     .tag { padding: 7px 11px; border: 1px solid #484550; border-radius: 999px; color: #e2e0e8; font-size: 12px; }
 
@@ -160,7 +162,6 @@
     .episode[aria-current="true"] .episode-number { background: var(--accent); color: #171a12; }
     .episode-copy { flex: 1; min-width: 0; }
     .episode-title { display: block; overflow: hidden; font-size: 14px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
-    .episode-subtitle { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
     .link-state { color: #777480; font-size: 12px; white-space: nowrap; }
     .episode.has-link .link-state { color: var(--accent); }
     .watched-control {
@@ -180,6 +181,36 @@
     .sync-heading h2 { font-size: 16px; }
     .sync-status { margin: 0; color: #f0bf74; font-size: 12px; }
     .setup-note { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+    .music-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(220px, 360px);
+      align-items: center;
+      gap: 18px;
+      margin: 0 0 24px;
+      padding: 18px;
+      border: 1px solid #302e39;
+      border-radius: 16px;
+      background: var(--panel);
+    }
+    .music-copy { min-width: 0; }
+    .music-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+    .music-heading h2 { font-size: 16px; }
+    .music-badge { padding: 4px 8px; border: 1px solid #484550; border-radius: 999px; color: var(--muted); font-size: 11px; }
+    .music-track { margin: 8px 0 0; color: #c1beca; font-size: 13px; }
+    .music-status { min-height: 36px; margin: 8px 0 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .music-toggle {
+      min-width: 120px;
+      padding: 10px 15px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #171a12;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .music-toggle:disabled { background: #35333e; color: #908d98; cursor: not-allowed; }
+    .music-player { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 12px; background: #111116; }
+    .music-player iframe { display: block; width: 100%; height: 100%; border: 0; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
     .empty { padding: 28px 14px; border: 1px dashed #3b3944; border-radius: 14px; color: var(--muted); text-align: center; font-size: 13px; }
 
@@ -226,6 +257,8 @@
       .detail { position: static; grid-row: 1; }
       .detail-art { min-height: 110px; }
       .header-note { font-size: 11px; }
+      .music-panel { grid-template-columns: 1fr; gap: 14px; }
+      .music-player { max-width: 480px; }
     }
     @media (max-width: 430px) {
       .page { width: min(100% - 24px, 1120px); }
@@ -255,10 +288,31 @@
         <p class="setup-note" id="setup-note">Supabase 설정 전에는 이 브라우저에만 저장됩니다. 로그인 없이 동기화하면 기록이 공개되어 누구나 읽고 바꿀 수 있어요. 설정 방법은 <code>SUPABASE_SETUP.md</code>를 참고하세요.</p>
       </section>
 
+      <section class="music-panel" aria-labelledby="music-heading">
+        <div class="music-copy">
+          <div class="music-heading">
+            <h2 id="music-heading">배경 음악</h2>
+            <span class="music-badge" id="music-badge">준비 중</span>
+          </div>
+          <p class="music-track">YouTube · 배경 음악</p>
+          <p class="music-status" id="music-status" role="status" aria-live="polite">YouTube 플레이어를 불러오는 중입니다.</p>
+          <button class="music-toggle" id="music-toggle" type="button" aria-pressed="false" disabled>불러오는 중…</button>
+        </div>
+        <div class="music-player" id="music-player" aria-label="배경 음악 YouTube 플레이어"></div>
+      </section>
+
       <section class="hero" aria-labelledby="anime-title">
         <div class="eyebrow">MY ANIME ARCHIVE</div>
         <h1 id="anime-title">쓰르라미 울 적에</h1>
-        <p class="description">기수별로 회차를 정리해 둔 개인 애니 아카이브입니다. 기수를 선택해 회차 목록으로 들어가세요.</p>
+        <div class="description">
+          <p>쇼와 58년 초여름. 예년보다 더위가 빨리 찾아온 올해 6월은 낮에는 매미의, 해 질 녘에는 쓰르라미의 합창을 들려주고 있었다.</p>
+          <p>XX현 시시보네시. 현의 경계에 있는 한적한 마을, 히나미자와. 인구 2천 명이 안 되는 이 마을에서, 그 사건은 매년 일어난다.</p>
+          <p>히나미자와 연속 괴사 사건 (1979년 ~ 1983년)<br>
+          매년 6월의 정해진 날에, 1명이 죽고 1명이 사라지는 괴기. 거대 댐 계획을 둘러싼 투쟁에서 자아지는 죽음의 연쇄. 쇼와 중기에 은폐됐던 괴사건이 되살아난다. 음모인가, 우연인가, 그렇지 않으면 저주인가.</p>
+          <p>있어야 할 사람이 없다. 없어야 할 사람이 있다.<br>
+          어젯밤 만났던 사람이, 살아있지 않다. 눈앞에 서 있는 사람이, 살아있지 않다.</p>
+          <p>참극은 피할 수 없는가, 굴복할 수밖에 없는가. 하지만, 굴복하지 마라. 당신이 아니면 맞설 수 없다.</p>
+        </div>
         <div class="meta">
           <span class="tag">애니메이션</span>
           <span class="tag">기수별 회차</span>
@@ -290,9 +344,8 @@
           <div class="detail-art" aria-hidden="true">✦</div>
           <div class="detail-label" id="detail-number">EPISODE 01</div>
           <h3 id="detail-title">제1화</h3>
-          <p id="detail-description">재생할 회차를 선택하세요.</p>
           <button class="play-button" id="play-button" type="button" disabled>재생 링크 없음</button>
-          <p class="hint">재생 링크는 파일 아래쪽 <code>season1Links</code>의 해당 회차 칸에 붙여 넣으세요.</p>
+          <p class="hint">회차 링크는 파일 아래쪽 <code>season1Links</code> 또는 <code>season2Links</code>의 해당 회차 칸에 붙여 넣으세요.</p>
         </aside>
       </section>
     </main>
@@ -307,39 +360,66 @@
       return {
         number,
         title: `제${number}화`,
-        description: "회차 설명을 추가할 수 있습니다.",
         url: ""
       };
     });
 
     // 링크를 각 회차의 따옴표 안에 붙여 넣으면 해당 회차의 재생 버튼이 활성화됩니다.
     const season1Links = [
-      "", // 1화
-      "", // 2화
-      "", // 3화
-      "", // 4화
-      "", // 5화
-      "", // 6화
-      "", // 7화
-      "", // 8화
-      "", // 9화
-      "", // 10화
-      "", // 11화
-      "", // 12화
-      "", // 13화
-      "", // 14화
-      "", // 15화
-      "", // 16화
-      "", // 17화
-      "", // 18화
-      "", // 19화
-      "", // 20화
+      "https://ani.glamov.com/tv-show.php?v=5cd88c657d4af318a927ab4fa5283eec", // 1화
+      "https://ani.glamov.com/tv-show.php?v=061769d9428c09348de057cb801a3a95", // 2화
+      "https://ani.glamov.com/tv-show.php?v=ade550dca3d7018d4cc4d88d52f9fc2b", // 3화
+      "https://ani.glamov.com/tv-show.php?v=616587212f1c410cfd33e17a7dbed834", // 4화
+      "https://ani.glamov.com/tv-show.php?v=92724f49913d1a8ee876c4977074b783", // 5화
+      "https://ani.glamov.com/tv-show.php?v=58d3dba23dbb98e5ffa405fcf97d7939", // 6화
+      "https://ani.glamov.com/tv-show.php?v=5b45224f1fd5ba5c2beba67af4b978bb", // 7화
+      "https://ani.glamov.com/tv-show.php?v=3b5d7e520c66ccc69b16adf4899a1462", // 8화
+      "https://ani.glamov.com/tv-show.php?v=a7116553bf7f34303fcbc6b41c4e6988", // 9화
+      "https://ani.glamov.com/tv-show.php?v=d4d70652294439d8b805dd588333de4e", // 10화
+      "https://ani.glamov.com/tv-show.php?v=9af4a2561b5a20798d0b1a503da78cf0", // 11화
+      "https://ani.glamov.com/tv-show.php?v=f2bdc8c41f866a8fd45f225fbebe3400", // 12화
+      "https://ani.glamov.com/tv-show.php?v=7427db80c19fdc3bec7e1c06422461f6", // 13화
+      "https://ani.glamov.com/tv-show.php?v=b08a2a2dcb81c2b6eb88eee8f0fa6e09", // 14화
+      "https://ani.glamov.com/tv-show.php?v=bf5ad9ff4c3fef0a6ba9a0dac847611f", // 15화
+      "https://ani.glamov.com/tv-show.php?v=9bcb7bdd6d7824beef84f5ab6e41b711", // 16화
+      "https://ani.glamov.com/tv-show.php?v=e7a7e2d8033f6e94fa670761f52736ca", // 17화
+      "https://ani.glamov.com/tv-show.php?v=94f5fc9147c69f2bfefb112489c2d4ce", // 18화
+      "https://ani.glamov.com/tv-show.php?v=d4ebee16896e3bbf254b8c91c75dd22a", // 19화
+      "https://ani.glamov.com/tv-show.php?v=5a4425c4dc0477b65474868005cfdb05", // 20화
       "https://ani.glamov.com/tv-show.php?v=cfd43c68083f6f7369609fd6bd9976bd", // 21화
       "https://ani.glamov.com/tv-show.php?v=5c7e914c379ea79da9cbbe3075ea6e30", // 22화
       "https://ani.glamov.com/tv-show.php?v=148079a9d45d7821d12f9eb990aca773", // 23화
       "https://ani.glamov.com/tv-show.php?v=1dd85515759d0e124eefc9006be441bc", // 24화
       "https://ani.glamov.com/tv-show.php?v=6b4f3aea797d480e0d33d124fd1f431f", // 25화
       "https://ani.glamov.com/tv-show.php?v=d275ab57c9c2d02a1a83a61dd2b295ca"  // 26화
+    ];
+
+    // 2기 링크를 등록할 때 해당 회차의 빈 따옴표 안에 주소를 붙여 넣으세요.
+    const season2Links = [
+      "https://ani.glamov.com/tv-show.php?v=0e5add0c68449ef72542b3e486a009ba", // 1화
+      "https://ani.glamov.com/tv-show.php?v=222cbded2a573d70d71263a66ec56751", // 2화
+      "https://ani.glamov.com/tv-show.php?v=486cf85736c42b7e3d1abf701c5bbf13", // 3화
+      "https://ani.glamov.com/tv-show.php?v=430bc249f70d47b17c11071596b22be4", // 4화
+      "https://ani.glamov.com/tv-show.php?v=cf4ac8941a359b6cdf0da9dfd56ffbcb", // 5화
+      "https://ani.glamov.com/tv-show.php?v=38908ab9cef9d91b5d3b6d7f1924065d", // 6화
+      "https://ani.glamov.com/tv-show.php?v=bd8c4a9448ebf5931f08b9617f960834", // 7화
+      "https://ani.glamov.com/tv-show.php?v=40aa242a1988c5d2ce6a8ad299fdc04e", // 8화
+      "https://ani.glamov.com/tv-show.php?v=52b683fba69c0ac4fd03f29a2b801f23", // 9화
+      "https://ani.glamov.com/tv-show.php?v=c4a610e31d06caed1b922c958689138b", // 10화
+      "https://ani.glamov.com/tv-show.php?v=8c8ddfe62cfc87cade567164205e5878", // 11화
+      "https://ani.glamov.com/tv-show.php?v=022073a2543e6b1b9eb84ba28f4e01b9", // 12화
+      "https://ani.glamov.com/tv-show.php?v=1ca2907a9b6b8cade57b4bc00b2b129f", // 13화
+      "https://ani.glamov.com/tv-show.php?v=04fef683a418fe69a679ab54d98699c0", // 14화
+      "https://ani.glamov.com/tv-show.php?v=2a8fdf51048fd6fc68133e988ce2d35e", // 15화
+      "https://ani.glamov.com/tv-show.php?v=c17ccd3aad11f6d462d29458246586d0", // 16화
+      "https://ani.glamov.com/tv-show.php?v=5d33a8cc7c7031e7e0436ea15dedfc41", // 17화
+      "https://ani.glamov.com/tv-show.php?v=5157263dcc06299d4452a5307984f434", // 18화
+      "https://ani.glamov.com/tv-show.php?v=7209eccc4163943e8421eeaf6816861d", // 19화
+      "https://ani.glamov.com/tv-show.php?v=c5e0005f15e05c766d620d26d663dcaf", // 20화
+      "https://ani.glamov.com/tv-show.php?v=8424e598a79065cb4ced3d11a7a2890f", // 21화
+      "https://ani.glamov.com/tv-show.php?v=be18ba96d66132cd66aab5f4c1b4094b", // 22화
+      "https://ani.glamov.com/tv-show.php?v=afcfeba8b2876c7c21437dc3d66240c6", // 23화
+      "https://ani.glamov.com/tv-show.php?v=9a5725814ea96019df7eb45c69c44aa7"  // 24화
     ];
 
     const seasons = [
@@ -352,7 +432,15 @@
           url: season1Links[index]
         }))
       },
-      { id: "season-2", title: "2기", subtitle: "회차를 추가하세요", episodes: [] }
+      {
+        id: "season-2",
+        title: "2기",
+        subtitle: "쓰르라미 울 적에 해답편",
+        episodes: makeEpisodes(24).map((episode, index) => ({
+          ...episode,
+          url: season2Links[index]
+        }))
+      }
     ];
 
     let selectedSeason = seasons[0];
@@ -364,6 +452,112 @@
     const storageStatus = document.querySelector("#storage-status");
     const syncStatus = document.querySelector("#sync-status");
     const setupNote = document.querySelector("#setup-note");
+    const musicToggle = document.querySelector("#music-toggle");
+    const musicStatus = document.querySelector("#music-status");
+    const musicBadge = document.querySelector("#music-badge");
+    const backgroundMusicVideoId = "-raVWfwztas";
+    let backgroundMusicPlayer = null;
+    let backgroundMusicReady = false;
+    let backgroundMusicPlaying = false;
+
+    function setMusicStatus(message, badge = "준비 중") {
+      musicStatus.textContent = message;
+      musicBadge.textContent = badge;
+    }
+
+    function setMusicPlaying(isPlaying) {
+      backgroundMusicPlaying = isPlaying;
+      musicToggle.textContent = isPlaying ? "음악 끄기" : "음악 켜기";
+      musicToggle.setAttribute("aria-pressed", String(isPlaying));
+      setMusicStatus(
+        isPlaying ? "배경 음악이 재생 중입니다." : "배경 음악이 꺼져 있습니다.",
+        isPlaying ? "재생 중" : "꺼짐"
+      );
+    }
+
+    function onBackgroundMusicReady(event) {
+      backgroundMusicPlayer = event.target;
+      backgroundMusicReady = true;
+      musicToggle.disabled = false;
+      musicToggle.textContent = "음악 켜기";
+      setMusicStatus("자동 재생을 시도합니다. 소리가 나지 않으면 ‘음악 켜기’를 눌러 주세요.", "시작 시도");
+      backgroundMusicPlayer.playVideo();
+    }
+
+    function onBackgroundMusicStateChange(event) {
+      if (event.data === YT.PlayerState.PLAYING) {
+        setMusicPlaying(true);
+      } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+        setMusicPlaying(false);
+      } else if (event.data === YT.PlayerState.BUFFERING) {
+        setMusicStatus("YouTube에서 음악을 불러오는 중입니다.", "불러오는 중");
+      }
+    }
+
+    function onBackgroundMusicAutoplayBlocked() {
+      if (!backgroundMusicPlaying) {
+        setMusicStatus("브라우저가 자동 재생을 막았습니다. 아래 버튼을 눌러 음악을 시작해 주세요.", "사용자 조작 필요");
+        musicToggle.textContent = "음악 켜기";
+      }
+    }
+
+    function onBackgroundMusicError(event) {
+      backgroundMusicReady = false;
+      musicToggle.disabled = true;
+      musicToggle.textContent = "재생할 수 없음";
+      const errorMessages = {
+        2: "YouTube 영상 주소가 올바르지 않습니다.",
+        5: "이 브라우저에서 YouTube HTML5 영상을 재생할 수 없습니다.",
+        100: "YouTube 영상이 삭제되었거나 비공개 상태입니다.",
+        101: "영상 소유자가 외부 사이트에서의 재생을 허용하지 않았습니다.",
+        150: "영상 소유자가 외부 사이트에서의 재생을 허용하지 않았습니다.",
+        153: "브라우저가 YouTube에 사이트 정보를 전달하지 못했습니다. Pages의 HTTPS 사이트에서 다시 확인해 주세요."
+      };
+      setMusicStatus(
+        errorMessages[event.data] || "YouTube에서 이 영상을 재생할 수 없습니다. 잠시 후 다시 확인해 주세요.",
+        `재생 오류${event.data ? ` ${event.data}` : ""}`
+      );
+    }
+
+    window.onYouTubeIframeAPIReady = () => {
+      backgroundMusicPlayer = new YT.Player("music-player", {
+        videoId: backgroundMusicVideoId,
+        playerVars: {
+          autoplay: 1,
+          controls: 1,
+          playsinline: 1,
+          rel: 0
+        },
+        events: {
+          onReady: onBackgroundMusicReady,
+          onStateChange: onBackgroundMusicStateChange,
+          onAutoplayBlocked: onBackgroundMusicAutoplayBlocked,
+          onError: onBackgroundMusicError
+        }
+      });
+    };
+
+    musicToggle.addEventListener("click", () => {
+      if (!backgroundMusicReady || !backgroundMusicPlayer) return;
+      if (backgroundMusicPlaying) {
+        backgroundMusicPlayer.pauseVideo();
+        setMusicPlaying(false);
+      } else {
+        setMusicStatus("음악 재생을 시작합니다...", "시작 중");
+        backgroundMusicPlayer.playVideo();
+      }
+    });
+
+    const youtubeApiScript = document.createElement("script");
+    youtubeApiScript.src = "https://www.youtube.com/iframe_api";
+    youtubeApiScript.async = true;
+    youtubeApiScript.onerror = () => {
+      musicToggle.disabled = true;
+      musicToggle.textContent = "플레이어 오류";
+      setMusicStatus("YouTube 플레이어를 불러오지 못했습니다. 네트워크 연결을 확인해 주세요.", "연결 오류");
+    };
+    document.head.append(youtubeApiScript);
+
     const watchedStorageKey = "animePlaylistWatchedEpisodes";
     // Replace both values with your Supabase project's URL and public anon/publishable key.
     const SUPABASE_URL = "https://afooakdnveyaukgpmnas.supabase.co";
@@ -371,9 +565,10 @@
     const syncConfigured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL)
       && !SUPABASE_URL.includes("YOUR_PROJECT_ID")
       && SUPABASE_ANON_KEY.length > 20
-      && !SUPABASE_ANON_KEY.includes("sb_publishable_Ncdw2LGHZQg0f9_iPBspeg_bZizlqSt");
+      && !SUPABASE_ANON_KEY.includes("YOUR_SUPABASE_ANON_KEY");
     let watchedEpisodes = {};
     let cloudReady = false;
+    let cloudRefreshInProgress = false;
     let syncQueue = Promise.resolve();
 
     try {
@@ -510,13 +705,14 @@
     function syncSeason(seasonId) {
       if (!markPendingSeason(seasonId)) return Promise.resolve(false);
       if (!cloudReady) return Promise.resolve(false);
+      const numbers = watchedEpisodes[seasonId] || [];
       const operation = syncQueue.then(async () => {
         await supabaseRequest("/rest/v1/watched_episodes?on_conflict=season_id", {
           method: "POST",
           headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
           body: JSON.stringify([{
             season_id: seasonId,
-            episode_numbers: watchedEpisodes[seasonId] || [],
+            episode_numbers: numbers,
             updated_at: new Date().toISOString()
           }])
         });
@@ -540,6 +736,43 @@
         allSynced = (await syncSeason(seasonId)) && allSynced;
       }
       return allSynced;
+    }
+
+    async function refreshCloudRecords() {
+      if (!syncConfigured || !cloudReady || document.hidden || cloudRefreshInProgress) return;
+      cloudRefreshInProgress = true;
+      try {
+        const rows = await supabaseRequest(
+          "/rest/v1/watched_episodes?select=season_id,episode_numbers"
+        );
+        const pendingSeasons = JSON.parse(localStorage.getItem("animePlaylistPendingSync") || "[]");
+        if (!Array.isArray(pendingSeasons) || !pendingSeasons.every((seasonId) => typeof seasonId === "string")) {
+          throw new Error("동기화 대기 기록의 형식이 올바르지 않습니다.");
+        }
+        let changed = false;
+        for (const row of rows) {
+          if (typeof row.season_id !== "string" || !Array.isArray(row.episode_numbers)
+            || !row.episode_numbers.every(Number.isInteger)) {
+            throw new Error("클라우드 기록 형식이 올바르지 않습니다.");
+          }
+          if (pendingSeasons.includes(row.season_id)) continue;
+          const current = watchedEpisodes[row.season_id] || [];
+          if (JSON.stringify(current) !== JSON.stringify(row.episode_numbers)) {
+            watchedEpisodes[row.season_id] = row.episode_numbers;
+            changed = true;
+          }
+        }
+        if (changed) {
+          localStorage.setItem(watchedStorageKey, JSON.stringify(watchedEpisodes));
+          renderSeasons();
+          renderEpisodes();
+          setSyncMessage("다른 기기의 시청 기록을 반영했습니다.");
+        }
+      } catch (error) {
+        setSyncMessage(`클라우드 기록을 새로고침하지 못했습니다: ${error.message}`, true);
+      } finally {
+        cloudRefreshInProgress = false;
+      }
     }
 
     function updateSeasonProgress() {
@@ -584,7 +817,7 @@
     function renderEpisodes() {
       const query = search.value.trim().toLocaleLowerCase("ko");
       const matchingEpisodes = selectedSeason.episodes.filter((episode) =>
-        `${episode.title} ${episode.description} ${episode.number}`.toLocaleLowerCase("ko").includes(query)
+        `${episode.title} ${episode.number}`.toLocaleLowerCase("ko").includes(query)
       );
 
       list.replaceChildren();
@@ -609,7 +842,6 @@
             <span class="episode-number">${String(episode.number).padStart(2, "0")}</span>
             <span class="episode-copy">
               <span class="episode-title"></span>
-              <span class="episode-subtitle"></span>
             </span>
             <span class="link-state">${episode.url ? "링크 있음 ↗" : "링크 준비 중"}</span>
           </button>
@@ -619,7 +851,6 @@
           </label>
         `;
         row.querySelector(".episode-title").textContent = episode.title;
-        row.querySelector(".episode-subtitle").textContent = episode.description;
         const watchedCheckbox = row.querySelector(".watched-checkbox");
         watchedCheckbox.checked = isEpisodeWatched(selectedSeason, episode.number);
         watchedCheckbox.setAttribute("aria-label", `${episode.title} 시청 완료`);
@@ -659,9 +890,6 @@
         ? `${selectedSeason.title.toLocaleUpperCase("ko")} · EPISODE ${String(episode.number).padStart(2, "0")}`
         : selectedSeason.title.toLocaleUpperCase("ko");
       document.querySelector("#detail-title").textContent = episode ? episode.title : "회차를 추가하세요";
-      document.querySelector("#detail-description").textContent = episode
-        ? episode.description
-        : "이 기수의 회차와 재생 링크를 추가하면 여기에 표시됩니다.";
       playButton.disabled = !episode || !episode.url;
       playButton.textContent = episode && episode.url ? "재생 페이지 열기 ↗" : "재생 링크 없음";
       renderEpisodes();
@@ -677,8 +905,13 @@
     renderSeasons();
     selectEpisode(selectedEpisode);
     if (syncConfigured) {
-      setupNote.textContent = "계정 없이 모든 방문자가 같은 시청 기록을 공유합니다. 기록은 공개되며 누구나 바꿀 수 있어요.";
-      loadAndMergeCloudRecords();
+      setupNote.textContent = "계정 없이 모든 방문자가 같은 시청 기록을 공유합니다. 기록은 공개되며 누구나 바꿀 수 있어요. 다른 기기 기록은 약 10초마다 확인합니다.";
+      loadAndMergeCloudRecords().then(() => {
+        if (!cloudReady) return;
+        window.setInterval(refreshCloudRecords, 10000);
+        window.addEventListener("focus", refreshCloudRecords);
+        document.addEventListener("visibilitychange", refreshCloudRecords);
+      });
     } else {
       setSyncMessage("Supabase 미설정 · 시청 기록은 이 브라우저에만 저장됩니다.", true);
     }
